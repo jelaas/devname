@@ -52,12 +52,12 @@ static char *getstring(const char *dir, const char *file)
  * scan usb devices.
  * add matching devices to result list
  */
-int usb_scan(struct jlhead *result, const struct jlhead *sel)
+int devname_usb_scan(struct jlhead *result, const struct jlhead *sel)
 {
 	return usb_scan_dir(result, sel, "/sys/bus/usb/devices");
 }
 
-char *dev_probe(const char *name)
+static char *dev_probe(const char *name)
 {
 	char fn[512];
 	struct stat statb;
@@ -72,7 +72,7 @@ char *dev_probe(const char *name)
 	return "f";
 }
 
-struct devname *devname_new(const char *dir)
+static struct devname *devname_new(const char *dir)
 {
 	struct devname *dn;
 	char *name;

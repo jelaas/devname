@@ -28,7 +28,7 @@ int main()
 	result = jl_new();
 	sel = jl_new();
 
-	usb_scan(result, sel);
+	devname_usb_scan(result, sel);
 	
 	jl_foreach(result, dev) {
 		int controller=0;

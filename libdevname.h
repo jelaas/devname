@@ -7,13 +7,13 @@
  * Find devices matching selections in list 'sel' (of type struct dev_info).
  * Put matching devices in result list 'result'.
  */
-int dev_scan(struct jlhead *result, const struct jlhead *sel);
+int devname_dev_scan(struct jlhead *result, const struct jlhead *sel);
 
 /*
  * Find USB devices matching selections in list 'sel' (of type struct dev_info).
  * Put matching USB devices in result list 'result'.
  */
-int usb_scan(struct jlhead *result, const struct jlhead *sel);
+int devname_usb_scan(struct jlhead *result, const struct jlhead *sel);
 
 struct devname {
   char *dev;

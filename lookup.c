@@ -138,7 +138,7 @@ int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize,
 
 	/* look for usb devices */
 	if(strcmp(class, "usb")==0)
-		usb_scan(result, sel);
+		devname_usb_scan(result, sel);
 
 	if(!devpattern) {
 		dev = jl_head_first(result);
