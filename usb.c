@@ -19,11 +19,9 @@
 #include <ctype.h>
 #include <fnmatch.h>
 
-#include "jelist.h"
-
 #include "libdevname.h"
 
-static int usb_scan_dir(struct jlhead *result, const struct jlhead *sel, const char *dir);
+static int usb_scan_dir(struct dev_head *result, const struct devinfo_head *sel, const char *dir);
 
 static char *getstring(const char *dir, const char *file)
 {
@@ -52,7 +50,7 @@ static char *getstring(const char *dir, const char *file)
  * scan usb devices.
  * add matching devices to result list
  */
-int devname_usb_scan(struct jlhead *result, const struct jlhead *sel)
+int devname_usb_scan(struct dev_head *result, const struct devinfo_head *sel)
 {
 	return usb_scan_dir(result, sel, "/sys/bus/usb/devices");
 }
@@ -86,6 +84,7 @@ static struct devname *devname_new(const char *dir)
 	dn->devname = name;
 	dn->type = dev_probe(name);
 	dn->pos = strlen(dir);
+	dn->next = NULL;
 //	printf("devname_new %s %s %s\n", dn->dev, dn->devname, dir);
 	return dn;
 }
@@ -93,11 +92,12 @@ static struct devname *devname_new(const char *dir)
 /*
  * depth-first scan for all dev files. name of parentdir is assumed to be node name.
  */
-static int usb_scan_devname(const char *dir, struct jlhead *devnames)
+static int usb_scan_devname(const char *dir, struct devname_head *devnames)
 {
 	DIR *d;
 	struct dirent *ent;
 	char fn[512];
+	int len;
 	
 //	printf("scan_devname opening dir %s\n", dir);
 	d = opendir(dir);
@@ -117,27 +117,37 @@ static int usb_scan_devname(const char *dir, struct jlhead *devnames)
 		if(!strcmp(ent->d_name, "dev")) {
 			struct devname *devname;
 			devname = devname_new(dir);
-			if(devname)
-				jl_ins(devnames, devname);
+			if(devname) {
+				devname->next = devnames->head;
+				devnames->head = devname;
+			}
 		}
 	}
 	closedir(d);
-	return devnames->len;
+	
+	{
+		struct devname *dn;
+		len=0;
+		for(dn=devnames->head;dn;dn=dn->next)
+			len++;
+	}
+	return len;
 }
 
 static int dev_info_add(struct dev *dev, const char *dir, const char *name)
 {
-	struct dev_info *info;
+	struct devinfo *info;
 	char *value;
 	
 	value = getstring(dir, name);
 
 	if(value) {
-		info = malloc(sizeof(struct dev_info));
+		info = malloc(sizeof(struct devinfo));
 		info->name = name;
 		info->value = value;
 	
-		jl_ins(dev->info, info);
+		info->next = dev->info.head;
+		dev->info.head = info;
 		return 0;
 	}
 	return -1;
@@ -148,16 +158,18 @@ static struct dev *dev_new()
 	struct dev *d;
 	d = malloc(sizeof(struct dev));
 	d->class = "usb";
+	d->next = NULL;
 	return d;
 }
-static int dev_match(const struct jlhead *info, const struct jlhead *selectors)
+
+static int dev_match(const struct devinfo_head *info, const struct devinfo_head *selectors)
 {
 	int match=1;
-	struct dev_info *sel, *i;
+	struct devinfo *sel, *i;
 	
-	jl_foreach(selectors, sel) {
+	for(sel=selectors->head;sel;sel=sel->next) {
 		match=0;
-		jl_foreach(info, i) {
+		for(i=info->head;i;i=i->next) {
 			if(strcmp(i->name, sel->name)==0) {
 				if(fnmatch(sel->value, i->value, 0)==0) {
 					match=1;
@@ -171,34 +183,36 @@ static int dev_match(const struct jlhead *info, const struct jlhead *selectors)
 	return match;
 }
 
-static int usb_scan_dev(struct jlhead *result, const struct jlhead *sel, const char *dir)
+static int usb_scan_dev(struct dev_head *result, const struct devinfo_head *sel, const char *dir)
 {
 	char *usbdev;
-	struct jlhead *devnames;
+	struct devname_head devnames;
 	struct dev *dev;
 	
 	usbdev = getstring(dir, "dev");
 	if(usbdev) {
-		devnames = jl_new();
+		devnames.head = NULL;
 		
-		if(usb_scan_devname(dir, devnames)) {
+		if(usb_scan_devname(dir, &devnames)) {
 			dev = dev_new();
-			dev->devnames = devnames;
-			dev->info = jl_new();
+			dev->devnames.head = devnames.head;
+			dev->info.head = NULL;
 			dev_info_add(dev, dir, "serial");
 			dev_info_add(dev, dir, "manufacturer");
 			dev_info_add(dev, dir, "product");
 			dev_info_add(dev, dir, "idProduct");
 			dev_info_add(dev, dir, "idVendor");
 
-			if(dev_match(dev->info, sel))
-				jl_ins(result, dev);
+			if(dev_match(&dev->info, sel)) {
+				dev->next = result->head;
+				result->head = dev;
+			}
 		}
 	}
 	return 0;
 }
 
-static int usb_scan_dir(struct jlhead *result, const struct jlhead *sel, const char *dir)
+static int usb_scan_dir(struct dev_head *result, const struct devinfo_head *sel, const char *dir)
 {
 	DIR *d;
 	struct dirent *ent;

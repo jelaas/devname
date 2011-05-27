@@ -11,8 +11,6 @@
 
 #include "devlookup.h"
 
-#include "jelist.h"
-
 int main(int argc, char **argv)
 {
 	char buf[512];

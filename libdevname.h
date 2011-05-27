@@ -1,36 +1,53 @@
 #ifndef LIBDEVNAME_H
 #define LIBDEVNAME_H
 
-#include "jelist.h"
-
-/*
- * Find devices matching selections in list 'sel' (of type struct dev_info).
- * Put matching devices in result list 'result'.
- */
-int devname_dev_scan(struct jlhead *result, const struct jlhead *sel);
-
-/*
- * Find USB devices matching selections in list 'sel' (of type struct dev_info).
- * Put matching USB devices in result list 'result'.
- */
-int devname_usb_scan(struct jlhead *result, const struct jlhead *sel);
+struct devname;
+struct devname_head {
+  struct devname *head;
+};
 
 struct devname {
   char *dev;
   char *devname;
   char *type;
   int pos;
+  struct devname *next;
 };
 
-struct dev_info {
+struct devinfo;
+struct devinfo_head {
+  struct devinfo *head;
+};
+
+struct devinfo {
   const char *name;
   const char *value;
+  struct devinfo *next;
+};
+
+struct dev;
+struct dev_head {
+  struct dev *head;
 };
 
 struct dev {
-  struct jlhead *info; /* list of struct dev_info */
-  struct jlhead *devnames; /* list of struct devname */
+  struct devinfo_head info;
+  struct devname_head devnames;
   char *class; /* "usb", "pci" etc */
+  struct dev *next;
 };
+
+/*
+ * Find devices matching selections in list 'sel' (of type struct dev_info).
+ * Put matching devices in result list 'result'.
+ */
+int devname_dev_scan(struct dev_head *result, const struct devinfo_head *sel);
+
+/*
+ * Find USB devices matching selections in list 'sel' (of type struct dev_info).
+ * Put matching USB devices in result list 'result'.
+ */
+int devname_usb_scan(struct dev_head *result, const struct devinfo_head *sel);
+
 
 #endif

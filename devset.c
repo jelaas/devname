@@ -20,8 +20,6 @@
 
 #include "devlookup.h"
 
-#include "jelist.h"
-
 int main(int argc, char **argv)
 {
 	char fn[256];

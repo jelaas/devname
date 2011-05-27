@@ -19,16 +19,14 @@
 #include "devlookup.h"
 #include "libdevname.h"
 
-#include "jelist.h"
-
 /* /etc/devname.d/x.conf */
 
-static int parse(const char *devname, char **class, char **devpattern, char **constdev, struct jlhead *sel)
+static int parse(const char *devname, char **class, char **devpattern, char **constdev, struct devinfo_head *sel)
 {
 	char *home, *pp, *p, *name, *value, fn[256], buf[512];
 	int fd;
 	ssize_t n;
-	struct dev_info *di;
+	struct devinfo *di;
 	
 	*class = NULL;
 	*devpattern = NULL;
@@ -82,11 +80,12 @@ static int parse(const char *devname, char **class, char **devpattern, char **co
 				continue;
 			}
 			
-			di = malloc(sizeof(struct dev_info));
+			di = malloc(sizeof(struct devinfo));
 			if(di) {
 				di->name = strdup(name);
 				di->value = strdup(value);
-				jl_ins(sel, di);
+				di->next = sel->head;
+				sel->head = di;
 			}
 		}
 	}
@@ -99,7 +98,7 @@ static char *dev_match(struct dev *dev, char *devpattern)
 {
 	struct devname *devname;
 	
-	jl_foreach(dev->devnames, devname) {
+	for(devname=dev->devnames.head;devname;devname=devname->next) {
 		if(fnmatch(devpattern, devname->devname, 0)==0) {
 			return devname->devname;
 		}
@@ -109,21 +108,22 @@ static char *dev_match(struct dev *dev, char *devpattern)
 
 int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize, const char *devname)
 {
-	struct jlhead *sel;
-	struct jlhead *result;
+	struct devinfo_head sel;
+	struct dev_head result;
 	struct dev *dev;
 	char *class, *devpattern, *constdev, *pfx="";
 	struct devname *dn;
 	
+	sel.head = NULL;
+	result.head = NULL;
+
 	if(strncmp(devname, "/dev/", 5)==0) {
 		pfx = "/dev/";
 		devname += 5;
 	}
 
-	sel = jl_new();
-	
 	/* parse config file in /etc/devname.d/ */
-	if(parse(devname, &class, &devpattern, &constdev, sel))
+	if(parse(devname, &class, &devpattern, &constdev, &sel))
 		return -1;
 	if(constbuf) {
 		constbuf[0] = 0;
@@ -132,18 +132,16 @@ int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize,
 		constbuf[constsize-1] = 0;
 	}
 	
-	result = jl_new();
-
 	if(!class) class = "usb";
 
 	/* look for usb devices */
 	if(strcmp(class, "usb")==0)
-		devname_usb_scan(result, sel);
+		devname_usb_scan(&result, &sel);
 
 	if(!devpattern) {
-		dev = jl_head_first(result);
+		dev = result.head;
 		if(dev) {
-			dn = jl_head_first(dev->devnames);
+			dn = dev->devnames.head;
 			if(dn) {
 				snprintf(buf, bufsize, "%s%s", pfx, dn->devname);
 				return 0;
@@ -153,7 +151,7 @@ int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize,
 
 	/* check for matching device node with devpattern among the devices that matched
 	   selectors */
-	jl_foreach(result, dev) {
+	for(dev=result.head;dev;dev=dev->next) {
 		/* find any matching devicenode */
 		if((devname = dev_match(dev, devpattern))) {
 			snprintf(buf, bufsize, "%s%s", pfx, devname);

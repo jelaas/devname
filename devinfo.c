@@ -14,27 +14,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "jelist.h"
 #include "libdevname.h"
 
 int main()
 {
-	struct jlhead *result;
-	struct jlhead *sel;
+	struct dev_head result;
+	struct devinfo_head sel;
 	struct dev *dev;
-	struct dev_info *info;
+	struct devinfo *info;
 	struct devname *d;
 
-	result = jl_new();
-	sel = jl_new();
-
-	devname_usb_scan(result, sel);
+	result.head = NULL;
+	sel.head = NULL;
 	
-	jl_foreach(result, dev) {
+	devname_usb_scan(&result, &sel);
+	
+	for(dev=result.head;dev;dev=dev->next) {
 		int controller=0;
 		
 		/* filter out the system USB controllers */
-		jl_foreach(dev->info, info) {
+		for(info=dev->info.head;info;info=info->next) {
 			if(strcmp(info->name, "idVendor")==0) {
 				if(strcmp(info->value, "1d6b")==0)
 					controller++;
@@ -46,10 +45,10 @@ int main()
 		}
 		if(controller==2) continue;
 		
-		jl_foreach(dev->info, info) {
+		for(info=dev->info.head;info;info=info->next) {
 			printf("%s=\"%s\" ", info->name, info->value);
 		}
-		jl_foreach(dev->devnames, d) {
+		for(d=dev->devnames.head;d;d=d->next) {
 			char fn[256];
 			struct stat statb;
 			sprintf(fn, "/dev/%s", d->devname);

@@ -9,7 +9,7 @@
 
 #include "libdevname.h"
 
-int devname_dev_scan(struct jlhead *result, const struct jlhead *sel)
+int devname_dev_scan(struct dev_head *result, const struct devinfo_head *sel)
 {
 	return devname_usb_scan(result,sel);
 }
