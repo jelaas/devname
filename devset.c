@@ -18,19 +18,33 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "libdevname.h"
 #include "devlookup.h"
+#include "jelopt.h"
 
 int main(int argc, char **argv)
 {
+	int rc=0, err=0;
 	char fn[256];
 	char dev[512];
 	char devname[512];
 	mode_t mask;
 	struct stat node;
 
+	if(jelopt(argv, 'h', "help", NULL, &err)) {
+	usage:
+		printf("devset [-h] name cmd arg ..\n"
+		       " version " LIBDEVNAME_VERSION "\n"
+		       " Runs 'cmd' or bash in a separate mount name space.\n"
+		       " This name space has its own mount of /dev with a devicenode created\n"
+		       " according to configuration of the devname 'name'.\n"
+			);
+		exit(rc);
+	}
+
 	if(argc <= 1) {
-		fprintf(stderr, "devset devname cmd arg ..\n");
-		exit(1);
+		rc=1;
+		goto usage;
 	}
 
 	if(devname_lookup2(dev, sizeof(dev), devname, sizeof(devname), argv[1])) {
@@ -42,7 +56,7 @@ int main(int argc, char **argv)
 		/* try heuristics to figure out a suitable devicenode name */
 
 		/* FIXME: last digit -> 0. sd** -> sda1. sd* -> sda etc */
-		/* altlet devname be the given devname alias... maybe not so bad? */
+		/* alt let devname be the given devname alias... maybe not so bad? */
 		strcpy(devname, argv[1]);
 	}
 

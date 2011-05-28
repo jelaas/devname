@@ -8,18 +8,38 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "libdevname.h"
 #include "devlookup.h"
+#include "jelopt.h"
 
 int main(int argc, char **argv)
 {
+	int err=0, rc=0;
 	char buf[512];
+
+	if(jelopt(argv, 'h', "help", NULL, &err)) {
+	usage:
+		printf("devlookup [-h] name\n"
+		       " version " LIBDEVNAME_VERSION "\n"
+		       " Lookup devicenode for devname 'name'. Print result on stdout.\n"
+			);
+		exit(rc);
+	}
+
+	argc = jelopt_final(argv, &err);
+
+	if(argc <= 1) {
+		rc=1;
+		goto usage;
+	}
 
 	if(devname_lookup(buf, sizeof(buf), argv[1])==0)
 		printf("%s\n", buf);
 	else {
-		fprintf(stderr, "not found\n");
-		return 1;
+		fprintf(stderr, "%s not found\n", argv[1]);
+		exit(1);
 	}
-	return 0;
+	exit(0);
 }

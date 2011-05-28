@@ -1,7 +1,7 @@
 CC:=gcc
 CFLAGS+=-Wall -Os -g
 all:	devinfo devname devset libdevname.a devlookup
-devinfo:	devinfo.o jelist.o libdevname.a
+devinfo:	devinfo.o jelist.o jelopt.o libdevname.a
 devname:	devname.o jelist.o jelopt.o libdevname.a
 devlookup:	devlookup.o jelist.o jelopt.o libdevname.a
 devset:		devset.o jelist.o jelopt.o libdevname.a

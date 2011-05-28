@@ -16,8 +16,11 @@
 
 #include "libdevname.h"
 
-int main()
+#include "jelopt.h"
+
+int main(int argc, char **argv)
 {
+	int err=0;
 	struct dev_head result;
 	struct devinfo_head sel;
 	struct dev *dev;
@@ -27,6 +30,14 @@ int main()
 	result.head = NULL;
 	sel.head = NULL;
 	
+	if(jelopt(argv, 'h', "help", NULL, &err)) {
+		printf("devinfo [-h]\n"
+		       " version " LIBDEVNAME_VERSION "\n"
+		       " Scans for and prints device information suitable as arguments for the\n"
+		       " 'devname' program.\n");
+		exit(0);
+	}
+
 	devname_usb_scan(&result, &sel);
 	
 	for(dev=result.head;dev;dev=dev->next) {

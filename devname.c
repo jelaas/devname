@@ -44,12 +44,25 @@ sel=val
 #include "jelopt.h"
 
 #include "libdevname.h"
+#include "jelopt.h"
 
 int main(int argc, char **argv)
 {
 	int fd, i, err=0;
 	char *dev;
 	char fn[256];
+
+	if(jelopt(argv, 'h', "help", NULL, &err)) {
+		printf("devname [-h] name selector ..\n"
+		       " version " LIBDEVNAME_VERSION "\n"
+		       " 'name' is your handle for the device that matches the given selectors.\n"
+		       " 'selector' is a 'name=value' pair. Suitable selectors is reported by the\n"
+		       " devinfo program.\n"
+			);
+		exit(0);
+	}
+	
+	argc = jelopt_final(argv, &err);
 	
 	dev=argv[1];
 	if(getuid()==0) {
