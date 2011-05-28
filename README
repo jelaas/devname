@@ -18,3 +18,24 @@ int devname_lookup(char *buf, size_t bufsize, const char *devname);
 int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize, const char *devname);
 
 #endif
+
+devinfo [-h]
+ version 1.0.0
+ Scans for and prints device information suitable as arguments for the
+ 'devname' program.
+
+devname [-h] name selector ..
+ version 1.0.0
+ 'name' is your handle for the device that matches the given selectors.
+ 'selector' is a 'name=value' pair. Suitable selectors is reported by the
+ devinfo program.
+
+devlookup [-h] name
+ version 1.0.0
+ Lookup devicenode for devname 'name'. Print result on stdout.
+
+devset [-h] name cmd arg ..
+ version 1.0.0
+ Runs 'cmd' or bash in a separate mount name space.
+ This name space has its own mount of /dev with a devicenode created
+ according to configuration of the devname 'name'.
