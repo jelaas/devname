@@ -50,6 +50,7 @@ int main(int argc, char **argv)
 {
 	int fd, i, err=0;
 	char *dev;
+	mode_t mask;
 	char fn[256];
 
 	if(jelopt(argv, 'h', "help", NULL, &err)) {
@@ -66,14 +67,17 @@ int main(int argc, char **argv)
 	
 	dev=argv[1];
 	if(getuid()==0) {
+		mask = umask(0);
 		sprintf(fn, "/etc/devname.d/%s.conf", dev);
 		mkdir("/etc/devname.d", 1755);
+		fd = open(fn, O_RDWR|O_CREAT|O_EXCL, 0644);
+		umask(mask);
 	} else {
 		sprintf(fn, "%s/.devname.d", getenv("HOME"));
 		mkdir(fn, 1755);
 		sprintf(fn, "%s/.devname.d/%s.conf", getenv("HOME"), dev);
+		fd = open(fn, O_RDWR|O_CREAT|O_EXCL, 0644);
 	}
-	fd = open(fn, O_RDWR|O_CREAT|O_EXCL, 0644);
 	if(fd == -1) {
 		printf("Cannot create %s (must not already exist!)\n", fn);
 		exit(1);
