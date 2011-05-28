@@ -17,6 +17,8 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <syscall.h>
+#define unshare(flags) ((long)syscall(SYS_unshare, flags))
 
 #include "libdevname.h"
 #include "devlookup.h"
