@@ -116,7 +116,9 @@ int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize,
 	
 	sel.head = NULL;
 	result.head = NULL;
-
+	
+	snprintf(buf, bufsize, "%s", devname);
+	
 	if(strncmp(devname, "/dev/", 5)==0) {
 		pfx = "/dev/";
 		devname += 5;
