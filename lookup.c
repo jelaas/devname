@@ -113,6 +113,7 @@ int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize,
 	struct dev *dev;
 	char *class, *devpattern, *constdev, *pfx="";
 	struct devname *dn;
+	int len = 0;
 	
 	sel.head = NULL;
 	result.head = NULL;
@@ -140,13 +141,17 @@ int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize,
 	if(strcmp(class, "usb")==0)
 		devname_usb_scan(&result, &sel);
 
+	for(dev=result.head;dev;dev=dev->next) {
+		len++;
+	}
+
 	if(!devpattern) {
 		dev = result.head;
 		if(dev) {
 			dn = dev->devnames.head;
 			if(dn) {
 				snprintf(buf, bufsize, "%s%s", pfx, dn->devname);
-				return 0;
+				return len;
 			}
 		}
 	}
@@ -157,13 +162,21 @@ int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize,
 		/* find any matching devicenode */
 		if((devname = dev_match(dev, devpattern))) {
 			snprintf(buf, bufsize, "%s%s", pfx, devname);
-			return 0;
+			return len;
 		}
 	}
-	return 1;
+	return 0;
 }
 
 int devname_lookup(char *buf, size_t bufsize, const char *devname)
 {
 	return devname_lookup2(buf, bufsize, NULL, 0, devname);
+}
+
+char *devname_get(const char *devname)
+{
+	char buf[64];
+	buf[0] = 0;
+	devname_lookup(buf, sizeof(buf), devname);
+	return strdup(buf);
 }

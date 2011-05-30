@@ -17,4 +17,6 @@ int devname_lookup(char *buf, size_t bufsize, const char *devname);
 /* also returns a constant name if supplied in the configuration */
 int devname_lookup2(char *buf, size_t bufsize, char *constbuf, size_t constsize, const char *devname);
 
+char *devname_get(const char *devname);
+
 #endif
