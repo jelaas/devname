@@ -21,23 +21,30 @@ char *devname_get(const char *devname);
 
 #endif
 
-devinfo [-h]
- version 1.0.0
+devname-info [-h]
+ version 1.0.3
  Scans for and prints device information suitable as arguments for the
  'devname' program.
 
-devname [-h] name selector ..
- version 1.0.1
+devname-cfg [-h] name selector ..
+ version 1.0.3
  'name' is your handle for the device that matches the given selectors.
  'selector' is a 'name=value' pair. Suitable selectors is reported by the
- devinfo program.
+ devname-info program.
 
-devlookup [-h] name
- version 1.0.0
- Lookup devicenode for devname 'name'. Print result on stdout.
+ Magic selectors (maybe not reported by devname-info):
+  dev=<pattern>               device name pattern for selecting device node
+  devname=<nodename>          devname-set will use this constant name for the device node
+  class=<subsystem>           class is usb by default
 
-devset [-h] name cmd arg ..
- version 1.0.1
+The devname configurations are saved in '/etc/devname.d' or '$HOME/.devname.d'.
+
+devname-lookup [-h] name
+ version 1.0.3
+ Lookup device node for devname 'name'. Print result on stdout.
+
+devname-set [-h] name cmd arg ..
+ version 1.0.3
  Runs 'cmd' or bash in a separate mount name space.
  This name space has its own mount of /dev with a devicenode created
  according to configuration of the devname 'name'.
