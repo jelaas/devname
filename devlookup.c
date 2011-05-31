@@ -21,9 +21,9 @@ int main(int argc, char **argv)
 
 	if(jelopt(argv, 'h', "help", NULL, &err)) {
 	usage:
-		printf("devlookup [-h] name\n"
+		printf("devname-lookup [-h] name\n"
 		       " version " LIBDEVNAME_VERSION "\n"
-		       " Lookup devicenode for devname 'name'. Print result on stdout.\n"
+		       " Lookup device node for devname 'name'. Print result on stdout.\n"
 			);
 		exit(rc);
 	}

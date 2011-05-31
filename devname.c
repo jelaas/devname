@@ -54,11 +54,18 @@ int main(int argc, char **argv)
 	char fn[256];
 
 	if(jelopt(argv, 'h', "help", NULL, &err)) {
-		printf("devname [-h] name selector ..\n"
-		       " version " LIBDEVNAME_VERSION "\n"
-		       " 'name' is your handle for the device that matches the given selectors.\n"
-		       " 'selector' is a 'name=value' pair. Suitable selectors is reported by the\n"
-		       " devinfo program.\n"
+		printf("devname-cfg [-h] name selector ..\n"
+		        " version " LIBDEVNAME_VERSION "\n"
+		        " 'name' is your handle for the device that matches the given selectors.\n"
+		        " 'selector' is a 'name=value' pair. Suitable selectors is reported by the\n"
+		        " devname-info program.\n"
+			"\n"
+		  	" Magic selectors (maybe not reported by devname-info):\n"
+			"  dev=<pattern>               device name pattern for selecting device node\n"
+			"  devname=<nodename>          devname-set will use this constant name for the device node\n"
+			"  class=<subsystem>           class is usb by default\n"
+			"\n"
+			"The devname configurations are saved in '/etc/devname.d' or '$HOME/.devname.d'.\n"
 			);
 		exit(0);
 	}

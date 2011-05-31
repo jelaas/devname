@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	sel.head = NULL;
 	
 	if(jelopt(argv, 'h', "help", NULL, &err)) {
-		printf("devinfo [-h]\n"
+		printf("devname-info [-h]\n"
 		       " version " LIBDEVNAME_VERSION "\n"
 		       " Scans for and prints device information suitable as arguments for the\n"
 		       " 'devname' program.\n");

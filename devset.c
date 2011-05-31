@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
 	if(jelopt(argv, 'h', "help", NULL, &err)) {
 	usage:
-		printf("devset [-h] name cmd arg ..\n"
+		printf("devname-set [-h] name cmd arg ..\n"
 		       " version " LIBDEVNAME_VERSION "\n"
 		       " Runs 'cmd' or bash in a separate mount name space.\n"
 		       " This name space has its own mount of /dev with a devicenode created\n"

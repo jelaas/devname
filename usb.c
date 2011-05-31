@@ -140,7 +140,7 @@ static int dev_info_add(struct dev *dev, const char *dir, const char *name)
 	char *value;
 	
 	value = getstring(dir, name);
-
+	
 	if(value) {
 		info = malloc(sizeof(struct devinfo));
 		info->name = name;
