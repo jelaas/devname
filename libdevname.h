@@ -1,7 +1,7 @@
 #ifndef LIBDEVNAME_H
 #define LIBDEVNAME_H
 
-#define LIBDEVNAME_VERSION "1.0.2"
+#define LIBDEVNAME_VERSION "1.0.3"
 
 struct devname;
 struct devname_head {
