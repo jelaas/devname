@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 		goto usage;
 	}
 
-	if(devname_lookup(buf, sizeof(buf), argv[1])==0)
+	if(devname_lookup(buf, sizeof(buf), argv[1])>0)
 		printf("%s\n", buf);
 	else {
 		fprintf(stderr, "%s not found\n", argv[1]);

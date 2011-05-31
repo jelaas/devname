@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 		goto usage;
 	}
 
-	if(devname_lookup2(dev, sizeof(dev), devname, sizeof(devname), argv[1])) {
+	if(devname_lookup2(dev, sizeof(dev), devname, sizeof(devname), argv[1]) <= 0) {
 		fprintf(stderr, "%s not found\n", argv[1]);
 		return 1;
 	}
