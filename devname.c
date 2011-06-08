@@ -54,6 +54,7 @@ int main(int argc, char **argv)
 	char fn[256];
 
 	if(jelopt(argv, 'h', "help", NULL, &err)) {
+	usage:
 		printf("devname-cfg [-h] name selector ..\n"
 		        " version " LIBDEVNAME_VERSION "\n"
 		        " 'name' is your handle for the device that matches the given selectors.\n"
@@ -71,6 +72,8 @@ int main(int argc, char **argv)
 	}
 	
 	argc = jelopt_final(argv, &err);
+
+	if(argc < 3) goto usage;
 	
 	dev=argv[1];
 	if(getuid()==0) {
